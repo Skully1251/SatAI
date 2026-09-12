@@ -64,7 +64,7 @@ export const ContactSection: React.FC = () => {
                 </View>
                 <View>
                   <Text style={styles.cardMiniLabel}>EMAIL US</Text>
-                  <Text style={styles.cardValue}>contact@lumina-ai.eco</Text>
+                  <Text style={styles.cardValue}>satqueryai@gmail.com</Text>
                 </View>
               </View>
 
@@ -78,7 +78,7 @@ export const ContactSection: React.FC = () => {
                 </View>
                 <View>
                   <Text style={styles.cardMiniLabel}>HEADQUARTERS</Text>
-                  <Text style={styles.cardValue}>Zurich, Switzerland</Text>
+                  <Text style={styles.cardValue}>Greater Noida, India</Text>
                 </View>
               </View>
             </View>
@@ -99,7 +99,7 @@ export const ContactSection: React.FC = () => {
                     <Text style={styles.inputLabel}>YOUR NAME</Text>
                     <TextInput
                       style={styles.textInput}
-                      placeholder="Dr. Elena Vance"
+                      placeholder="John Doe"
                       placeholderTextColor={colors.inputPlaceholder}
                       value={name}
                       onChangeText={setName}
@@ -111,7 +111,7 @@ export const ContactSection: React.FC = () => {
                     <Text style={styles.inputLabel}>YOUR EMAIL</Text>
                     <TextInput
                       style={styles.textInput}
-                      placeholder="elena@conservation-lab.org"
+                      placeholder="johndoe@gmail.com"
                       placeholderTextColor={colors.inputPlaceholder}
                       value={email}
                       onChangeText={setEmail}
@@ -137,8 +137,6 @@ export const ContactSection: React.FC = () => {
 
                 {/* Bottom Row: Info + Submit */}
                 <View style={styles.submitRow}>
-                  <Text style={styles.encryptedText}>Encrypted transmission</Text>
-
                   <TouchableOpacity
                     style={styles.sendButton}
                     onPress={handleSubmit}
