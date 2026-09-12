@@ -1,0 +1,50 @@
+# ================================
+# SatQueryAI Backend Requirements
+# ================================
+
+# ---------- FastAPI & Server ----------
+fastapi
+uvicorn[standard]
+python-multipart
+
+# ---------- Configuration ----------
+pydantic-settings
+python-dotenv
+
+# ---------- Cloud / Supabase ----------
+supabase
+
+# ---------- HTTP Client ----------
+httpx
+
+# ---------- GeoTIFF / Geospatial ----------
+rasterio
+numpy
+Pillow
+
+# ---------- Database / ORM ----------
+sqlalchemy
+psycopg2-binary
+
+# ---------- Authentication / Security ----------
+python-jose[cryptography]
+passlib[bcrypt]
+bcrypt
+
+# ---------- Report Generation ----------
+reportlab
+jinja2
+
+# ---------- File & Data Utilities ----------
+aiofiles
+
+# ---------- Testing ----------
+pytest
+pytest-asyncio
+
+# ---------- Logging ----------
+structlog
+
+# ---------- Development ----------
+black
+ruff
