@@ -9,17 +9,9 @@ export const INITIAL_SUGGESTIONS: SuggestedPrompt[] = [
   { id: '4', text: 'Generate a sustainable city plan.' },
 ];
 
-export interface UserProfile {
-  name: string;
-  role: string;
-  email: string;
-}
-
 interface ChatState {
-  // Navigation & Auth
+  // Navigation
   currentPage: 'landing' | 'chat' | 'map';
-  isAuthenticated: boolean;
-  user: UserProfile | null;
 
   // Chat State
   messages: ChatMessage[];
@@ -30,8 +22,6 @@ interface ChatState {
 
   // Actions
   setCurrentPage: (page: 'landing' | 'chat' | 'map') => void;
-  setIsAuthenticated: (val: boolean) => void;
-  toggleAuth: () => void;
   setInputValue: (val: string) => void;
   toggleSidebar: () => void;
   setSidebarOpen: (open: boolean) => void;
@@ -43,12 +33,6 @@ interface ChatState {
 export const useChatStore = create<ChatState>((set, get) => ({
   // Default landing page
   currentPage: 'landing',
-  isAuthenticated: false,
-  user: {
-    name: 'Dr. Aris Thorne',
-    role: 'Lead Conservationist',
-    email: 'aris.thorne@lumina-ai.eco',
-  },
 
   messages: [],
   inputValue: '',
@@ -57,8 +41,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
   activeNavTab: 'new_chat',
 
   setCurrentPage: (currentPage) => set({ currentPage }),
-  setIsAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
-  toggleAuth: () => set((state) => ({ isAuthenticated: !state.isAuthenticated })),
 
   setInputValue: (inputValue: string) => set({ inputValue }),
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),

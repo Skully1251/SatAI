@@ -14,9 +14,11 @@ import { HowToUseSection } from './HowToUseSection';
 import { FeaturesSection } from './FeaturesSection';
 import { ContactSection } from './ContactSection';
 import { useChatStore } from '../../store/chatStore';
+import { useAuthStore } from '../../store/authStore';
 
 export const LandingPage: React.FC = () => {
-  const { isAuthenticated, setCurrentPage } = useChatStore();
+  const { status, openAuthModal } = useAuthStore();
+  const setCurrentPage = useChatStore((state) => state.setCurrentPage);
   const scrollRef = useRef<ScrollView>(null);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -64,10 +66,11 @@ export const LandingPage: React.FC = () => {
   };
 
   const handleGetStarted = () => {
-    if (isAuthenticated) {
+    if (status === 'authenticated') {
       setCurrentPage('chat');
     } else {
-      alert('Please log in or sign up to access Sat AI Chat.');
+      // Opens the auth modal; on success the user is carried into chat.
+      openAuthModal('signup', 'goToChat');
     }
   };
 

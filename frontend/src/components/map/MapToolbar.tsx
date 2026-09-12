@@ -11,6 +11,7 @@ interface MapToolbarProps {
   onSelectMode: (mode: DrawMode) => void;
   onZoomIn: () => void;
   onZoomOut: () => void;
+  onResetView: () => void;
   onClearRegion: () => void;
 }
 
@@ -52,6 +53,7 @@ export const MapToolbar: React.FC<MapToolbarProps> = ({
   onSelectMode,
   onZoomIn,
   onZoomOut,
+  onResetView,
   onClearRegion,
 }) => {
   const iconColor = (active: boolean) => (active ? '#FAF7F2' : colors.forestDark);
@@ -119,6 +121,27 @@ export const MapToolbar: React.FC<MapToolbarProps> = ({
       </ToolButton>
       <ToolButton label="Zoom out" onPress={onZoomOut}>
         <Text style={styles.zoomText}>−</Text>
+      </ToolButton>
+
+      {/* Reset view — fly the globe/canvas back to the home camera */}
+      <ToolButton label="Reset view" onPress={onResetView}>
+        <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+          <Circle
+            cx="12"
+            cy="12"
+            r="8.2"
+            stroke={colors.forestDark}
+            strokeWidth="1.9"
+            fill="none"
+          />
+          <Circle cx="12" cy="12" r="2.4" fill={colors.forestGreen} />
+          <Path
+            d="M12 1.6 V4.4 M12 19.6 V22.4 M1.6 12 H4.4 M19.6 12 H22.4"
+            stroke={colors.forestDark}
+            strokeWidth="1.9"
+            strokeLinecap="round"
+          />
+        </Svg>
       </ToolButton>
 
       <View style={styles.divider} />

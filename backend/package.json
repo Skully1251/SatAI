@@ -1,0 +1,24 @@
+{
+  "name": "sih2026-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sat AI spatial-analysis backend — serves the map XAI contract in shared/",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^5.1.0",
+    "firebase-admin": "^14.4.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^22.15.0",
+    "tsx": "^4.20.0",
+    "typescript": "~6.0.3"
+  }
+}
