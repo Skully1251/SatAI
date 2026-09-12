@@ -13,6 +13,7 @@ import Svg, { Path, Circle } from 'react-native-svg';
 import { colors } from '../../theme/colors';
 import { radii, shadows } from '../../theme/spacing';
 import { useChatStore } from '../../store/chatStore';
+import { useAuthStore } from '../../store/authStore';
 import { MapCanvas } from './MapCanvas';
 import { MapToolbar } from './MapToolbar';
 import { AnalysisPopup } from './AnalysisPopup';
@@ -25,7 +26,8 @@ import { MapRegion } from '../../services/mapAnalysisService';
  * into an explainable-AI analysis (mock service behind a backend-ready API).
  */
 export const MapDashboardPage: React.FC = () => {
-  const { setCurrentPage, user, setInputValue } = useChatStore();
+  const { setCurrentPage, setInputValue } = useChatStore();
+  const { user } = useAuthStore();
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
 
@@ -57,10 +59,10 @@ export const MapDashboardPage: React.FC = () => {
     region && anchor
       ? 'Region selected — describe what to explain'
       : drawMode === 'polygon'
-        ? 'Tap vertices · tap the hollow first vertex to finish'
+        ? 'Tap the globe to place vertices · tap the hollow first vertex to finish'
         : drawMode === 'rect'
-          ? 'Press & drag on the map to draw a rectangle'
-          : 'Pick the Draw tool below-right, then outline a region';
+          ? 'Press & drag on the globe to draw a rectangle'
+          : 'Drag to orbit the globe · scroll to zoom';
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -86,7 +88,6 @@ export const MapDashboardPage: React.FC = () => {
         </TouchableOpacity>
 
         <View style={styles.titlePill}>
-          <View style={styles.pulseDot} />
           <Text style={styles.titlePillText} numberOfLines={1}>
             {isMobile ? 'Eco Map' : 'Eco Map Dashboard'}
           </Text>
@@ -94,9 +95,7 @@ export const MapDashboardPage: React.FC = () => {
 
         <TouchableOpacity
           style={styles.profileButton}
-          onPress={() =>
-            alert(`Logged in as ${user?.name ?? 'Guest'} (${user?.role ?? 'Explorer'})`)
-          }
+          onPress={() => alert(`Logged in as ${user?.name ?? 'Guest'}${user?.email ? ` (${user.email})` : ''}`)}
           activeOpacity={0.85}
         >
           <Svg width={19} height={19} viewBox="0 0 24 24" fill="none">
@@ -137,8 +136,16 @@ export const MapDashboardPage: React.FC = () => {
             onSelectMode={setDrawMode}
             onZoomIn={() => canvasApiRef.current?.zoomIn()}
             onZoomOut={() => canvasApiRef.current?.zoomOut()}
+            onResetView={() => canvasApiRef.current?.resetView?.()}
             onClearRegion={handleClearRegion}
           />
+
+          {/* Imagery credit, bottom-left (globe is free NASA/OSM-adjacent imagery) */}
+          <View style={styles.creditPill} pointerEvents="none">
+            <Text style={styles.creditText}>
+              Imagery: NASA Blue Marble · Globe: globe.gl
+            </Text>
+          </View>
 
           {/* Status hint, bottom-center */}
           <View style={styles.hintPill} pointerEvents="none">
@@ -281,6 +288,20 @@ const styles = StyleSheet.create({
   hintText: {
     color: '#FAF7F2',
     fontSize: 11,
+    fontWeight: '600',
+  },
+  creditPill: {
+    position: 'absolute',
+    bottom: 18,
+    left: 18,
+    backgroundColor: 'rgba(25, 48, 32, 0.6)',
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: radii.full,
+  },
+  creditText: {
+    color: 'rgba(250, 247, 242, 0.85)',
+    fontSize: 9.5,
     fontWeight: '600',
   },
 });

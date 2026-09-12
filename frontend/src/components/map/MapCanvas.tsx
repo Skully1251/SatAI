@@ -1,7 +1,7 @@
 /**
- * Native map canvas — stylized SVG stand-in for the Leaflet web map so the
- * draw → analyze flow also works in Expo Go / native builds without a tile
- * backend. Same MapCanvasProps contract as MapCanvas.web.tsx.
+ * Native map canvas — stylized SVG stand-in for the web globe so the
+ * draw → analyze flow also works in Expo Go / native builds without a
+ * tile backend. Same MapCanvasProps contract as MapCanvas.web.tsx.
  *
  * Gestures: drag = pan, tap = add polygon vertex (double-tap closes),
  * rectangle mode = tap two opposite corners.
@@ -213,9 +213,22 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
     });
   };
 
+  /** Center the artwork in the viewport — mirrors the web globe's home view. */
+  const fitWorld = () => {
+    const { w, h } = canvasSizeRef.current;
+    if (w === 0 || h === 0) return;
+    const scale = Math.min(w / WORLD_W, h / WORLD_H) * 0.92;
+    setView({
+      scale,
+      tx: (w - WORLD_W * scale) / 2,
+      ty: (h - WORLD_H * scale) / 2,
+    });
+  };
+
   const apiRef = useRef<MapCanvasApi>({
     zoomIn: () => zoomAt(1.25),
     zoomOut: () => zoomAt(0.8),
+    resetView: () => fitWorld(),
     clearDrawing: () => {
       clearDraft();
       emitAnchor();
@@ -246,12 +259,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
     setCanvasSize({ w: width, h: height });
     if (!viewInitializedRef.current && width > 0 && height > 0) {
       viewInitializedRef.current = true;
-      const scale = Math.min(width / WORLD_W, height / WORLD_H) * 0.92;
-      setView({
-        scale,
-        tx: (width - WORLD_W * scale) / 2,
-        ty: (height - WORLD_H * scale) / 2,
-      });
+      fitWorld();
     }
   };
 

@@ -12,11 +12,13 @@ export interface ContainerPoint {
 export interface MapCanvasApi {
   zoomIn: () => void;
   zoomOut: () => void;
+  /** Return the camera to the initial home view. */
+  resetView?: () => void;
   /** Abort any in-progress drawing and drop the finished region. */
   clearDrawing: () => void;
 }
 
-/** Contract both the web (Leaflet) and native (SVG) canvas implementations share. */
+/** Contract both the web (globe) and native (SVG) canvas implementations share. */
 export interface MapCanvasProps {
   drawMode: DrawMode;
   /** Completed region owned by the page; rendered as a filled overlay. */

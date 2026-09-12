@@ -16,7 +16,9 @@ import { ChatCanvas } from './src/components/chat/ChatCanvas';
 import { EcoMapPreviewCard } from './src/components/map/EcoMapPreviewCard';
 import { MapDashboardPage } from './src/components/map/MapDashboardPage';
 import { LandingPage } from './src/components/landing/LandingPage';
+import { AuthModal } from './src/components/auth/AuthModal';
 import { useChatStore } from './src/store/chatStore';
+import { useAuthStore } from './src/store/authStore';
 
 export default function App() {
   const { width } = useWindowDimensions();
@@ -25,6 +27,12 @@ export default function App() {
 
   const { messages, currentPage, setCurrentPage } = useChatStore();
   const isChatActive = messages.length > 0;
+
+  // Subscribe to Firebase auth state once at the app root.
+  const initAuth = useAuthStore((state) => state.initAuth);
+  useEffect(() => {
+    initAuth();
+  }, [initAuth]);
 
   // Mobile sidebar collapse state
   const [collapsed, setCollapsed] = useState(isMobile);
@@ -57,19 +65,27 @@ export default function App() {
     setCurrentPage('map');
   };
 
-  // If on Landing page, render LandingPage directly
+  // If on Landing page, render LandingPage directly (auth modal on top)
   if (currentPage === 'landing') {
     return (
-      <SafeAreaView style={styles.safeAreaLanding}>
-        <StatusBar barStyle="dark-content" backgroundColor={colors.sageBg} />
-        <LandingPage />
-      </SafeAreaView>
+      <>
+        <SafeAreaView style={styles.safeAreaLanding}>
+          <StatusBar barStyle="dark-content" backgroundColor={colors.sageBg} />
+          <LandingPage />
+        </SafeAreaView>
+        <AuthModal />
+      </>
     );
   }
 
   // If on Map Dashboard page, render it full-screen (no sidebar)
   if (currentPage === 'map') {
-    return <MapDashboardPage />;
+    return (
+      <>
+        <MapDashboardPage />
+        <AuthModal />
+      </>
+    );
   }
 
   // Otherwise, render the Chat view
@@ -142,8 +158,9 @@ export default function App() {
     : undefined;
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.creamSidebar} />
+    <>
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar barStyle="dark-content" backgroundColor={colors.creamSidebar} />
 
       <View style={styles.mainContainer}>
         {/* Sidebar */}
@@ -209,7 +226,9 @@ export default function App() {
           </View>
         </View>
       </View>
-    </SafeAreaView>
+      </SafeAreaView>
+      <AuthModal />
+    </>
   );
 }
 

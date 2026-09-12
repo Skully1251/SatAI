@@ -6,10 +6,12 @@ import {
   TouchableOpacity,
   Platform,
 } from 'react-native';
-import Svg, { Path, Circle } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 import { colors } from '../../theme/colors';
 import { radii, shadows } from '../../theme/spacing';
 import { useChatStore } from '../../store/chatStore';
+import { useAuthStore } from '../../store/authStore';
+import { UserMenu } from '../auth/UserMenu';
 
 type SectionId = 'hero' | 'how-to-use' | 'features' | 'contact';
 
@@ -26,8 +28,8 @@ const NAV_ITEMS: { id: SectionId; label: string }[] = [
 ];
 
 export const LandingNavbar: React.FC<LandingNavbarProps> = ({ onScrollTo, isScrolled = false }) => {
-  const { isAuthenticated, setIsAuthenticated, setCurrentPage, user } = useChatStore();
-  const [showUserMenu, setShowUserMenu] = useState(false);
+  const { status, openAuthModal } = useAuthStore();
+  const setCurrentPage = useChatStore((state) => state.setCurrentPage);
 
   // Smooth highlighting capsule positioning
   const [highlightStyle, setHighlightStyle] = useState<{
@@ -41,16 +43,12 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({ onScrollTo, isScro
   });
 
   const handleGetStarted = () => {
-    if (isAuthenticated) {
+    if (status === 'authenticated') {
       setCurrentPage('chat');
     } else {
-      alert('Please log in or sign up to access Sat AI Chat.');
+      // Opens the auth modal; on success the user is carried into chat.
+      openAuthModal('signup', 'goToChat');
     }
-  };
-
-  const handleAuth = (mode: 'login' | 'signup') => {
-    setIsAuthenticated(true);
-    alert(`Successfully authenticated as ${user?.name || 'Dr. Aris Thorne'}!`);
   };
 
   // Web mouse-enter handler for smooth gliding capsule
@@ -136,7 +134,7 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({ onScrollTo, isScro
 
         {/* Right: Auth Actions or User Icon */}
         <View style={styles.actionsRow}>
-          {!isAuthenticated ? (
+          {status !== 'authenticated' ? (
             <>
               <TouchableOpacity
                 style={styles.getStartedGhostBtn}
@@ -147,14 +145,14 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({ onScrollTo, isScro
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.loginBtn}
-                onPress={() => handleAuth('login')}
+                onPress={() => openAuthModal('login')}
                 activeOpacity={0.85}
               >
                 <Text style={styles.loginBtnText}>Log in</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.signupBtn}
-                onPress={() => handleAuth('signup')}
+                onPress={() => openAuthModal('signup')}
                 activeOpacity={0.85}
               >
                 <Text style={styles.signupBtnText}>Sign up</Text>
@@ -170,51 +168,7 @@ export const LandingNavbar: React.FC<LandingNavbarProps> = ({ onScrollTo, isScro
                 <Text style={styles.getStartedGhostText}>Get Started</Text>
               </TouchableOpacity>
 
-              {/* User Avatar Button */}
-              <TouchableOpacity
-                style={styles.userAvatarBtn}
-                onPress={() => setShowUserMenu(!showUserMenu)}
-                activeOpacity={0.85}
-              >
-                <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-                  <Circle cx="12" cy="8" r="4" stroke={colors.forestDark} strokeWidth="1.8" />
-                  <Path
-                    d="M4 20C4 16.6863 7.58172 14 12 14C16.4183 14 20 16.6863 20 20"
-                    stroke={colors.forestDark}
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                  />
-                </Svg>
-              </TouchableOpacity>
-
-              {/* User Dropdown Menu */}
-              {showUserMenu && (
-                <View style={styles.userDropdown}>
-                  <Text style={styles.userName}>{user?.name || 'Dr. Aris Thorne'}</Text>
-                  <Text style={styles.userEmail}>{user?.email || 'aris.thorne@lumina-ai.eco'}</Text>
-                  <View style={styles.dropdownDivider} />
-                  <TouchableOpacity
-                    style={styles.dropdownItem}
-                    onPress={() => {
-                      setShowUserMenu(false);
-                      setCurrentPage('chat');
-                    }}
-                  >
-                    <Text style={styles.dropdownItemText}>Go to Lumina Chat</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.dropdownItem}
-                    onPress={() => {
-                      setShowUserMenu(false);
-                      setIsAuthenticated(false);
-                    }}
-                  >
-                    <Text style={[styles.dropdownItemText, { color: colors.terracotta }]}>
-                      Log out
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              )}
+              <UserMenu />
             </View>
           )}
         </View>
@@ -443,55 +397,5 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 13,
     fontWeight: '600',
-  },
-  userAvatarBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: radii.full,
-    backgroundColor: colors.creamSidebar,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.8)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...shadows.subtle,
-    ...Platform.select({
-      web: { cursor: 'pointer' },
-    }),
-  },
-  userDropdown: {
-    position: 'absolute',
-    top: 48,
-    right: 0,
-    backgroundColor: colors.white,
-    borderRadius: radii.lg,
-    padding: 14,
-    minWidth: 190,
-    borderWidth: 1,
-    borderColor: colors.creamBorder,
-    ...shadows.card,
-    zIndex: 100,
-  },
-  userName: {
-    fontSize: 13.5,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  userEmail: {
-    fontSize: 11,
-    color: colors.textMuted,
-    marginTop: 2,
-  },
-  dropdownDivider: {
-    height: 1,
-    backgroundColor: colors.creamBorder,
-    marginVertical: 10,
-  },
-  dropdownItem: {
-    paddingVertical: 6,
-  },
-  dropdownItemText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.textPrimary,
   },
 });

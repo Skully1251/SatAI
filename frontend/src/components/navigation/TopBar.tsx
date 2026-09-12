@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
-import Svg, { Path, Circle } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 import { colors } from '../../theme/colors';
 import { radii, shadows } from '../../theme/spacing';
 import { MapDashboardButton } from './MapDashboardButton';
-import { useChatStore } from '../../store/chatStore';
+import { useAuthStore } from '../../store/authStore';
+import { UserMenu } from '../auth/UserMenu';
 
 interface TopBarProps {
   onPressMapDashboard: () => void;
@@ -21,7 +22,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   isMobile = false,
   onPressHome,
 }) => {
-  const { isAuthenticated, setCurrentPage } = useChatStore();
+  const { status, openAuthModal } = useAuthStore();
 
   return (
     <View style={styles.topBarContainer} pointerEvents="box-none">
@@ -58,12 +59,12 @@ export const TopBar: React.FC<TopBarProps> = ({
 
       {/* Right slot: Authentication actions or User Avatar button */}
       <View style={styles.authButtonsRow} pointerEvents="auto">
-        {!isAuthenticated ? (
+        {status !== 'authenticated' ? (
           <>
             <TouchableOpacity
               style={[styles.loginButton, isMobile && styles.compactAuthBtn]}
               activeOpacity={0.85}
-              onPress={() => alert('Redirecting to Authentication page (Log In)...')}
+              onPress={() => openAuthModal('login')}
             >
               <Text style={styles.loginButtonText}>Log in</Text>
             </TouchableOpacity>
@@ -71,27 +72,13 @@ export const TopBar: React.FC<TopBarProps> = ({
             <TouchableOpacity
               style={[styles.signupButton, isMobile && styles.compactAuthBtn]}
               activeOpacity={0.85}
-              onPress={() => alert('Redirecting to Authentication page (Sign Up)...')}
+              onPress={() => openAuthModal('signup')}
             >
               <Text style={styles.signupButtonText}>Sign up</Text>
             </TouchableOpacity>
           </>
         ) : (
-          <TouchableOpacity
-            style={styles.userAvatarBtn}
-            onPress={() => alert('Logged in as Dr. Aris Thorne (Lead Conservationist)')}
-            activeOpacity={0.85}
-          >
-            <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-              <Circle cx="12" cy="8" r="4" stroke={colors.forestDark} strokeWidth="1.8" />
-              <Path
-                d="M4 20C4 16.6863 7.58172 14 12 14C16.4183 14 20 16.6863 20 20"
-                stroke={colors.forestDark}
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              />
-            </Svg>
-          </TouchableOpacity>
+          <UserMenu />
         )}
       </View>
     </View>
@@ -187,19 +174,5 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontSize: 13.5,
     fontWeight: '600',
-  },
-  userAvatarBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: radii.full,
-    backgroundColor: colors.creamSidebar,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.8)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...shadows.subtle,
-    ...Platform.select({
-      web: { cursor: 'pointer' },
-    }),
   },
 });
