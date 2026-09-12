@@ -1,0 +1,67 @@
+# =========================
+# Satellite Data / Copernicus
+# =========================
+requests
+python-dotenv
+
+# =========================
+# Geospatial Processing
+# =========================
+rasterio
+geopandas
+shapely
+pyproj
+fiona
+
+# =========================
+# Numerical / Image Processing
+# =========================
+numpy
+pandas
+scipy
+scikit-image
+Pillow
+matplotlib
+
+# =========================
+# Deep Learning
+# =========================
+torch
+torchvision
+timm
+transformers
+accelerate
+
+# =========================
+# BigEarthNet / ViT Model
+# =========================
+configilm
+
+# =========================
+# Fine-tuning
+# =========================
+peft
+
+# =========================
+# Embeddings / RAG
+# =========================
+sentence-transformers
+faiss-cpu
+
+# =========================
+# LLM
+# =========================
+openai
+
+# =========================
+# Web Application / Visualization
+# =========================
+streamlit
+folium
+streamlit-folium
+
+# =========================
+# Utilities
+# =========================
+tqdm
+sentinelhub>=3.9.1

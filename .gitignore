@@ -1,0 +1,16 @@
+
+# Python virtual environment
+AI-backend/.venv/
+
+# Large datasets
+AI-backend/data/
+
+# Model weights
+AI-backend/models/
+
+# Large archives
+*.zip
+
+# Python cache
+__pycache__/
+*.pyc
