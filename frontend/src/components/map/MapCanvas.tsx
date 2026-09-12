@@ -170,6 +170,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onPanResponderGrant: (evt) => {
+        cancelFlight(); // a user gesture takes over from a search flight
         const { locationX, locationY } = evt.nativeEvent;
         gestureRef.current = {
           sx: locationX,
@@ -225,6 +226,48 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
     });
   };
 
+  const flightRef = useRef<number | null>(null);
+
+  const cancelFlight = () => {
+    if (flightRef.current !== null) {
+      cancelAnimationFrame(flightRef.current);
+      flightRef.current = null;
+    }
+  };
+
+  /** Google-Earth-ish glide: ease the viewport so the target point sits
+   *  centered at a zoom-mapped scale (the SVG artwork has no real zoom
+   *  ladder, so web zoom levels are mapped onto its scale range). */
+  const flyToLocation = (target: MapLatLng, zoom: number) => {
+    const { w, h } = canvasSizeRef.current;
+    if (w === 0 || h === 0) return;
+    cancelFlight();
+    const base = latLngToBase(target);
+    const fitScale = Math.min(w / WORLD_W, h / WORLD_H) * 0.92;
+    // z12 ≈ home view, z18 ≈ fully zoomed in on the artwork.
+    const targetScale = Math.min(4, Math.max(0.7, fitScale * Math.pow(2, (zoom - 12) / 2)));
+    const start = viewRef.current;
+    const end: Viewport = {
+      scale: targetScale,
+      tx: w / 2 - base.u * targetScale,
+      ty: h / 2 - base.v * targetScale,
+    };
+    const DURATION = 1200;
+    const t0 = Date.now();
+    const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    const step = () => {
+      const k = Math.min(1, (Date.now() - t0) / DURATION);
+      const e = ease(k);
+      setView({
+        scale: start.scale + (end.scale - start.scale) * e,
+        tx: start.tx + (end.tx - start.tx) * e,
+        ty: start.ty + (end.ty - start.ty) * e,
+      });
+      flightRef.current = k < 1 ? requestAnimationFrame(step) : null;
+    };
+    flightRef.current = requestAnimationFrame(step);
+  };
+
   const apiRef = useRef<MapCanvasApi>({
     zoomIn: () => zoomAt(1.25),
     zoomOut: () => zoomAt(0.8),
@@ -233,10 +276,12 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
       clearDraft();
       emitAnchor();
     },
+    flyToLocation,
   });
 
   useEffect(() => {
     registerApi(apiRef.current);
+    return () => cancelFlight();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

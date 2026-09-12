@@ -16,6 +16,8 @@ export interface MapCanvasApi {
   resetView?: () => void;
   /** Abort any in-progress drawing and drop the finished region. */
   clearDrawing: () => void;
+  /** Smoothly fly the camera to a searched location (Google-Earth-style arc). */
+  flyToLocation: (target: MapLatLng, zoom: number) => void;
 }
 
 /** Contract both the web (globe) and native (SVG) canvas implementations share. */

@@ -17,8 +17,10 @@ import { useAuthStore } from '../../store/authStore';
 import { MapCanvas } from './MapCanvas';
 import { MapToolbar } from './MapToolbar';
 import { AnalysisPopup } from './AnalysisPopup';
+import { MapSearchBar } from './MapSearchBar';
 import { MapCanvasApi, ContainerPoint, DrawMode } from './mapTypes';
 import { MapRegion } from '../../services/mapAnalysisService';
+import { SearchTarget } from '../../services/geocodeService';
 
 /**
  * Full-screen Eco Map Dashboard. User draws a region on the map, then a
@@ -55,6 +57,10 @@ export const MapDashboardPage: React.FC = () => {
     setCurrentPage('chat');
   };
 
+  const handleSearchSelect = (target: SearchTarget) => {
+    canvasApiRef.current?.flyToLocation({ lat: target.lat, lng: target.lng }, target.zoom);
+  };
+
   const statusHint =
     region && anchor
       ? 'Region selected — describe what to explain'
@@ -87,11 +93,11 @@ export const MapDashboardPage: React.FC = () => {
           <Text style={styles.chatViewButtonText}>Go to Chat View</Text>
         </TouchableOpacity>
 
-        <View style={styles.titlePill}>
-          <Text style={styles.titlePillText} numberOfLines={1}>
-            {isMobile ? 'Eco Map' : 'Eco Map Dashboard'}
-          </Text>
-        </View>
+        {!isMobile && (
+          <View style={styles.searchWrap}>
+            <MapSearchBar onSelectLocation={handleSearchSelect} />
+          </View>
+        )}
 
         <TouchableOpacity
           style={styles.profileButton}
@@ -109,6 +115,13 @@ export const MapDashboardPage: React.FC = () => {
           </Svg>
         </TouchableOpacity>
       </View>
+
+      {/* ---- Search bar (mobile: own row below the top bar) ---- */}
+      {isMobile && (
+        <View style={styles.searchRow}>
+          <MapSearchBar onSelectLocation={handleSearchSelect} />
+        </View>
+      )}
 
       {/* ---- Bezel-framed interactive map ---- */}
       <View style={styles.frame}>
@@ -140,10 +153,10 @@ export const MapDashboardPage: React.FC = () => {
             onClearRegion={handleClearRegion}
           />
 
-          {/* Imagery credit, bottom-left (globe is free NASA/OSM-adjacent imagery) */}
+          {/* Imagery credit, bottom-left (free XYZ tile pyramid on a MapLibre globe) */}
           <View style={styles.creditPill} pointerEvents="none">
             <Text style={styles.creditText}>
-              Imagery: NASA Blue Marble · Globe: globe.gl
+              Imagery: Google Satellite · Globe: MapLibre GL
             </Text>
           </View>
 
@@ -202,33 +215,17 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.forestDark,
   },
-  titlePill: {
+  searchWrap: {
     position: 'absolute',
     left: '50%',
-    transform: [{ translateX: -90 }],
-    width: 180,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 7,
-    backgroundColor: colors.forestDark,
-    borderRadius: radii.full,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.45)',
-    ...shadows.subtle,
+    transform: [{ translateX: -190 }],
+    width: 380,
+    zIndex: 30,
   },
-  pulseDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
-    backgroundColor: '#34D399',
-  },
-  titlePillText: {
-    color: colors.textLight,
-    fontSize: 12.5,
-    fontWeight: '700',
-    letterSpacing: -0.1,
+  searchRow: {
+    paddingHorizontal: 20,
+    marginBottom: 8,
+    zIndex: 30,
   },
   profileButton: {
     width: 40,
@@ -259,7 +256,10 @@ const styles = StyleSheet.create({
     position: 'relative',
     borderRadius: 18,
     overflow: 'hidden',
-    backgroundColor: colors.mapBackground,
+    // Dark space tone behind the globe — matches the style's background
+    // layer, so the rim outside the sphere never shows a light void even
+    // if a browser can't paint the sky backdrop pass.
+    backgroundColor: '#04070d',
   },
   hintPill: {
     position: 'absolute',
