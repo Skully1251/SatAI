@@ -12,7 +12,6 @@ interface TopBarProps {
   showMapButton?: boolean;
   mapButtonAnimatedStyle?: any;
   isMobile?: boolean;
-  onPressHome?: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
@@ -20,32 +19,13 @@ export const TopBar: React.FC<TopBarProps> = ({
   showMapButton = true,
   mapButtonAnimatedStyle,
   isMobile = false,
-  onPressHome,
 }) => {
   const { status, openAuthModal } = useAuthStore();
 
   return (
     <View style={styles.topBarContainer} pointerEvents="box-none">
-      {/* Left slot: Home button to return to Landing page */}
+      {/* Left slot: Empty as Home button is removed */}
       <View style={styles.leftSlot} pointerEvents="box-none">
-        {onPressHome && (
-          <TouchableOpacity
-            style={styles.homeButton}
-            onPress={onPressHome}
-            activeOpacity={0.8}
-          >
-            <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
-              <Path
-                d="M15 19l-7-7 7-7"
-                stroke={colors.forestDark}
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </Svg>
-            <Text style={styles.homeButtonText}>Home</Text>
-          </TouchableOpacity>
-        )}
       </View>
 
       {/* Center slot: Prominent Map Dashboard Button */}
@@ -102,26 +82,6 @@ const styles = StyleSheet.create({
     minWidth: 80,
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  homeButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.65)',
-    paddingVertical: 7,
-    paddingHorizontal: 12,
-    borderRadius: radii.full,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.6)',
-    ...shadows.subtle,
-    ...Platform.select({
-      web: { cursor: 'pointer', transition: 'background-color 0.2s' },
-    }),
-  },
-  homeButtonText: {
-    fontSize: 12.5,
-    fontWeight: '700',
-    color: colors.forestDark,
   },
   centerSlot: {
     flex: 1,

@@ -180,7 +180,6 @@ export default function App() {
             showMapButton={!isDesktop || isChatActive}
             mapButtonAnimatedStyle={mapButtonAnimatedStyle}
             isMobile={isMobile}
-            onPressHome={() => setCurrentPage('landing')}
           />
 
           {/* Main Content Layout */}
