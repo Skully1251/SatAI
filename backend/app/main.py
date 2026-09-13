@@ -4,12 +4,22 @@ from app.api.routes.chat import router as chat_router
 from app.api.routes.upload import router as upload_router
 from app.api.routes.metadata import router as metadata_router
 
+from app.core.database import init_database
+
 
 app = FastAPI(
     title="SatQueryAI Backend",
     description="Backend API for SatQueryAI",
     version="1.0.0"
 )
+
+
+@app.on_event("startup")
+def startup_event():
+
+    init_database()
+
+    print("SatQueryAI database initialized successfully.")
 
 
 @app.get("/", tags=["Root"])
@@ -41,15 +51,21 @@ def system_status():
     }
 
 
+# ==============================
+# API ROUTERS
+# ==============================
+
 app.include_router(
     chat_router,
     prefix="/api/v1"
 )
 
+
 app.include_router(
     upload_router,
     prefix="/api/v1"
 )
+
 
 app.include_router(
     metadata_router,
