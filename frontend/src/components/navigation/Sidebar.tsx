@@ -31,12 +31,14 @@ const PanelLeftCloseIcon = ({ color }: { color: string }) => (
   </Svg>
 );
 
-const PanelLeftOpenIcon = ({ color }: { color: string }) => (
-  <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
-    <Path d="M9 3v18" />
-    <Path d="m14 9 3 3-3 3" />
-  </Svg>
+const SidebarOpenIcon = () => (
+  <View style={styles.hoverOpenIconContainer}>
+    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke={colors.forestDark} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+      <Path d="M9 3v18" />
+      <Path d="m14 9 3 3-3 3" />
+    </Svg>
+  </View>
 );
 
 const LeafIcon = () => (
@@ -84,25 +86,33 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const renderFixedBranding = () => (
     <View style={styles.fixedBrandContainer} pointerEvents="box-none">
       <View style={styles.brandLogoContainer}>
+        {/* LEAF AREA (handles sidebar open when collapsed) */}
         <Pressable
           onHoverIn={() => setLogoHovered(true)}
           onHoverOut={() => setLogoHovered(false)}
           onPress={() => {
             if (collapsed) {
-              onToggleCollapse();
+              onToggleCollapse(); // Open sidebar
             } else {
-              setCurrentPage('landing');
+              setCurrentPage('landing'); // Go Home
             }
           }}
           style={styles.logoPressable}
         >
           {collapsed && logoHovered ? (
-            <PanelLeftOpenIcon color={colors.leafGreen} />
+            <SidebarOpenIcon />
           ) : (
             <LeafIcon />
           )}
         </Pressable>
-        <Text style={styles.brandTitle}>Sat AI</Text>
+
+        {/* TEXT AREA (always goes Home) */}
+        <Pressable
+          onPress={() => setCurrentPage('landing')}
+          style={styles.textPressable}
+        >
+          <Text style={styles.brandTitle} numberOfLines={1}>Sat AI</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -230,16 +240,21 @@ const styles = StyleSheet.create({
     top: 24,
     left: 16,
     zIndex: 30,
+    width: 200, // Prevent text wrapping when parent shrinks
   },
   brandLogoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
   },
   logoPressable: {
-    width: 24,
-    height: 24,
+    width: 32, // Fixed width to accommodate the 32x32 hover icon without jumping
+    height: 32,
     alignItems: 'center',
+    justifyContent: 'center',
+    ...Platform.select({ web: { cursor: 'pointer' } }),
+  },
+  textPressable: {
     justifyContent: 'center',
     ...Platform.select({ web: { cursor: 'pointer' } }),
   },
@@ -248,6 +263,15 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.textPrimary,
     letterSpacing: -0.3,
+    ...Platform.select({ web: { whiteSpace: 'nowrap' } }), // Ensure no wrapping
+  },
+  hoverOpenIconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: 'rgba(20, 40, 25, 0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   // Mobile elements
@@ -302,11 +326,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     marginBottom: 28,
-    height: 28,
+    height: 32, // Match logoPressable height
   },
   modernCollapseButton: {
-    width: 28,
-    height: 28,
+    width: 32,
+    height: 32,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radii.sm,

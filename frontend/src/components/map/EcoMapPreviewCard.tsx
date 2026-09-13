@@ -64,7 +64,7 @@ export const EcoMapPreviewCard: React.FC<EcoMapPreviewCardProps> = ({ onPressExp
               </G>
 
               {/* Central Ecological Nature Reserve Polygon */}
-              <G transform={`scale(${zoomLevel})`} origin="160, 190">
+              <G transform={`scale(${zoomLevel})`} originX="160" originY="190">
                 {/* Outer Eco-zone buffer */}
                 <Path
                   d="M160 70 C220 75, 270 120, 260 190 C250 250, 210 295, 150 290 C95 285, 65 240, 75 175 C82 120, 115 65, 160 70 Z"
